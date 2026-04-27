@@ -148,8 +148,14 @@
   }
 
   /* RodapÃ© */
-  .footer-note {
+  .footer-area {
     margin-top: 10px;
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+  }
+
+  .footer-note {
     font-size: 11px;
     color: #444;
     text-align: center;
@@ -158,12 +164,23 @@
     border-radius: 6px;
     padding: 8px;
     line-height: 1.5;
+    flex: 1;
+  }
+
+  .brand-logo {
+    width: 76px;
+    height: 76px;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 50%;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));
   }
 
   @media print {
     body { background: white; }
     .page { margin: 0; box-shadow: none; width: 100%; border-radius: 0; }
     .left-column, .right-column { overflow-y: visible; }
+    .brand-logo { width: 68px; height: 68px; }
   }
 </style>
 </head>
@@ -240,9 +257,12 @@ Pressione B  até acender a cor azul.<br>
     </div>
   </div>
 
-  <div class="footer-note">
-    <strong>Emparelhamento:</strong> Segure "Power" por 5s para parear (pisca verde 3x) ou desparear (pisca branco 3x).<br>
-    <strong>Configuração RGB:</strong> No menu Set (segure 5s), use Mode+/- para pixels e R/G/B para calibrar a ordem das cores.
+  <div class="footer-area">
+    <div class="footer-note">
+      <strong>Emparelhamento:</strong> Segure "Power" por 5s para parear (pisca verde 3x) ou desparear (pisca branco 3x).<br>
+      <strong>Configuração RGB:</strong> No menu Set (segure 5s), use Mode+/- para pixels e R/G/B para calibrar a ordem das cores.
+    </div>
+    <img class="brand-logo" src="Assinatura.png" alt="Logotipo L3D Ateliê">
   </div>
 </div>
 
