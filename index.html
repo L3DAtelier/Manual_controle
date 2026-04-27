@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Manual do Controle RF Wireless - LED RGB</title>
+<style>
+  /* 
+    VariÃ¡veis e estrutura:
+    - PÃ¡gina A4 horizontal (280mm x 190mm)
+    - Ãrea de diagrama com 3 colunas: esquerda (textos), centro (imagem), direita (textos)
+    - Imagem centralizada sem sobreposiÃ§Ã£o
+    - Setas desenhadas via canvas apontando para os botÃµes
+    - Colunas laterais com scroll interno para acomodar todos os textos
+  */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: #f0f2f5; 
+    color: #333; 
+  }
+
+  .page {
+    width: 280mm;
+    min-height: 190mm;
+    margin: 10mm auto;
+    background: white;
+    padding: 12mm;
+    position: relative;
+    page-break-after: always;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 12px;
+    border-bottom: 3px solid #1a1a6e;
+    padding-bottom: 8px;
+  }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1a1a6e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .page-subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-top: 3px;
+  }
+
+  /* Container principal com 3 colunas */
+  .diagram-area {
+    position: relative;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 240px 1fr;
+    grid-gap: 8px;
+    align-items: stretch;
+    justify-items: stretch;
+    min-height: 550px;
+  }
+
+  /* Coluna esquerda: textos */
+  .left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
+    width: 100%;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+
+  /* Coluna central: imagem */
+  .center-column {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .remote-img {
+    width: 240px;
+    z-index: 5;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+  }
+
+  canvas.arrows {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 30;
+  }
+
+  /* Coluna direita: textos */
+  .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
+    width: 100%;
+    overflow-y: auto;
+    padding-left: 5px;
+  }
+
+  /* Caixa de anotaÃ§Ã£o */
+  .ann {
+    background: white;
+    border: 2px solid #1a1a6e;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 11px;
+    line-height: 1.35;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    width: 100%;
+    min-width: 150px;
+    flex-shrink: 0;
+  }
+
+  .ann strong {
+    display: block;
+    color: #1a1a6e;
+    font-size: 12px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 2px;
+  }
+
+  .ann.special {
+    border-color: #c47a00;
+    background: #fffef0;
+  }
+
+  .ann.special strong {
+    color: #c47a00;
+  }
+
+  /* RodapÃ© */
+  .footer-note {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #444;
+    text-align: center;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+    line-height: 1.5;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; width: 100%; border-radius: 0; }
+    .left-column, .right-column { overflow-y: visible; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PÃGINA 1: PORTUGUÃŠS -->
+<div class="page" id="page1">
+  <div class="header">
+    <div class="page-title">Manual do Controle RF Wireless </div>
+    <div class="page-subtitle">Versão em Português Brasileiro | vários Efeitos</div>
+  </div>
+
+  <div class="diagram-area" id="d1">
+    <!-- COLUNA ESQUERDA -->
+    <div class="left-column">
+      <div class="ann" id="p_power">
+        <strong>Liga / Desliga</strong>Pressione para ligar ou desligar os LEDs.
+      </div>
+      <div class="ann" id="p_mode_minus">
+        <strong>MODE -</strong>Retrocede para o efeito anterior.
+      </div>
+      <div class="ann" id="p_bright_minus">
+        <strong>Brilho -</strong>Diminui a intensidade do brilho dos LEDs.<br> Diminui a sensibilidade no modo música.
+      </div>
+      <div class="ann" id="p_lock">
+        <strong>Cadeado (Loop)</strong>Pressione por 5 segundos para realizar o emparelhamento com o controle remoto (a fita de LED piscará em verde 3 vezes).<br> Pressione novamente por 5 segundos para cancelar o emparelhamento (a fita de LED piscará em branco 3 vezes).<br>
+<strong>Reprodução de ciclo único: </strong> No modo de reprodução automática, pressione o botão "Engrenagem"  uma vez e, em seguida, o botão "Cadeado"    para capturar e reproduzir o efeito atual em loop.
+      </div>
+      <div class="ann" id="p_pre1">
+        <strong>Modo Música: </strong>4 efeitos luminosos por tecla sincronizados com a música (microfone).<br> São 12 efeitos distribuidos entre as 3 teclas.
+      </div>
+      <div class="ann special" id="p_auto">
+        <strong>AUTO</strong>Reproduz os diversos efeitos automaticamente.<br> Pressione 5 vezes para entrar no efeito de cores solidas RGB (facilita o teste da fita de LED).
+      </div>
+      <div class="ann special" id="p_white"><strong>"White” Branco</strong>Ativa a cor branca fixa na fita de LED.
+      </div>
+    </div>
+
+    <!-- COLUNA CENTRAL -->
+    <div class="center-column">
+      <img class="remote-img" id="img2" src="Controle Frente.png">
+    </div>
+
+    <canvas class="arrows" id="c1"></canvas>
+
+    <!-- COLUNA DIREITA -->
+    <div class="right-column">
+      <div class="ann" id="p_speed_plus">
+        <strong>SPEED +</strong>Aumenta a velocidade dos efeitos de transição.
+      </div>
+      <div class="ann" id="p_mode_plus">
+        <strong>MODE +</strong>Avança para o próximo efeito.
+      </div>
+      <div class="ann" id="p_bright_plus">
+        <strong>Brilho +</strong>Aumenta a do brilho dos LEDs. <br> Aumenta a sensibilidade no modo música.
+      </div>
+      <div class="ann" id="p_settings">
+        <strong>Configurar (Set)</strong>Ajusta a quantidade de LEDs existentes e a ordem correta das cores RGB para os botões de cores dos LEDs:<br>
+1.	Pressione por 5 segundos esse botão para entrar no menu de configuração.<br>
+2.	Pressione MODE+ e MODE- para ajustar a qtde de LEDs existentes.<br>
+3.	Pressione os botões de cores  para ajuste correto da ordem das cores RGB:<br>
+Pressione R  até acender a cor vermelha.<br>
+Pressione G  até acender a cor verde.<br>
+Pressione B  até acender a cor azul.<br>
+4.	Após terminar o ajuste, pressione novamente essa tecla para sair.<br>
+
+      </div>
+      <div class="ann special" id="p_speed_minus">
+        <strong>SPEED-</strong>Diminui a velocidade dos efeitos de transição.
+      </div>
+      <div class="ann special" id="p_rgb">
+        <strong>R / G / B </strong>Seleção direta das cores (Vermelho, Verde e Azul). 
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <strong>Emparelhamento:</strong> Segure "Power" por 5s para parear (pisca verde 3x) ou desparear (pisca branco 3x).<br>
+    <strong>Configuração RGB:</strong> No menu Set (segure 5s), use Mode+/- para pixels e R/G/B para calibrar a ordem das cores.
+  </div>
+</div>
+
+
+
+<script>
+/**
+ * FunÃ§Ãµes de desenho das setas:
+ * drawArrows: Calcula as posiÃ§Ãµes dos botÃµes na imagem e desenha as setas
+ * drawArrow: Desenha uma linha tracejada com ponta de seta sÃ³lida
+ * 
+ * VariÃ¡veis principais:
+ * - buttons: Mapa com coordenadas normalizadas (0-1) de cada botÃ£o na imagem
+ * - annToBtn: Mapeamento entre IDs de anotaÃ§Ãµes e chaves de botÃµes
+ */
+
+function drawArrows(diagramId, canvasId, imgId, prefix) {
+  const diagram = document.getElementById(diagramId);
+  const canvas = document.getElementById(canvasId);
+  const img = document.getElementById(imgId);
+  
+  if (!diagram || !canvas || !img) return;
+  
+  const diagramW = diagram.clientWidth;
+  const diagramH = diagram.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  
+  canvas.style.width = `${diagramW}px`;
+  canvas.style.height = `${diagramH}px`;
+  canvas.width = Math.max(1, Math.round(diagramW * dpr));
+  canvas.height = Math.max(1, Math.round(diagramH * dpr));
+  
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, diagramW, diagramH);
+  ctx.strokeStyle = '#1a1a6e';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 3]);
+  
+  const diagramRect = diagram.getBoundingClientRect();
+  const imgRect = img.getBoundingClientRect();
+  
+  // PosiÃ§Ã£o da imagem relativa ao canvas (diagram)
+  const imgX = imgRect.left - diagramRect.left;
+  const imgY = imgRect.top - diagramRect.top;
+  const imgW = imgRect.width;
+  const imgH = imgRect.height;
+  
+  // Coordenadas normalizadas dos botÃµes na imagem (fx, fy de 0 a 1)
+  const buttons = {
+    power:       {fx: 0.25, fy: 0.12},
+    speed_plus:  {fx: 0.50, fy: 0.23},
+    mode_minus:  {fx: 0.25, fy: 0.35},
+    auto:        {fx: 0.50, fy: 0.35},
+    mode_plus:   {fx: 0.75, fy: 0.35},
+    speed_minus: {fx: 0.50, fy: 0.46},
+    bright_minus:{fx: 0.25, fy: 0.46},
+    bright_plus: {fx: 0.75, fy: 0.46},
+    lock:        {fx: 0.25, fy: 0.58},
+    white:       {fx: 0.50, fy: 0.58},
+    settings:    {fx: 0.75, fy: 0.58},
+    rgb_r:       {fx: 0.25, fy: 0.70},
+    rgb_g:       {fx: 0.50, fy: 0.70},
+    rgb_b:       {fx: 0.75, fy: 0.70},
+    pre1:        {fx: 0.25, fy: 0.82},
+    pre2:        {fx: 0.50, fy: 0.82},
+    pre3:        {fx: 0.75, fy: 0.82},
+  };
+  
+  const annToBtn = {
+    [`${prefix}_power`]:       'power',
+    [`${prefix}_speed_plus`]:  'speed_plus',
+    [`${prefix}_mode_minus`]:  'mode_minus',
+    [`${prefix}_auto`]:        'auto',
+    [`${prefix}_mode_plus`]:   'mode_plus',
+    [`${prefix}_bright_minus`]:'bright_minus',
+    [`${prefix}_speed_minus`]: 'speed_minus',
+    [`${prefix}_bright_plus`]: 'bright_plus',
+    [`${prefix}_lock`]:        'lock',
+    [`${prefix}_white`]:       'white',
+    [`${prefix}_settings`]:    'settings',
+    [`${prefix}_rgb`]:         'rgb_g',
+    [`${prefix}_pre1`]:        'pre1',
+    [`${prefix}_pre2`]:        'pre2',
+    [`${prefix}_pre3`]:        'pre3',
+  };
+  
+  Object.entries(annToBtn).forEach(([annId, btnKey]) => {
+    const ann = document.getElementById(annId);
+    if (!ann || !buttons[btnKey]) return;
+    
+    const annRect = ann.getBoundingClientRect();
+    
+    // Centro da anotaÃ§Ã£o relativo ao canvas (diagram)
+    const ax = annRect.left - diagramRect.left + annRect.width / 2;
+    const ay = annRect.top - diagramRect.top + annRect.height / 2;
+    
+    // PosiÃ§Ã£o do botÃ£o na imagem
+    const btn = buttons[btnKey];
+    const bx = imgX + btn.fx * imgW;
+    const by = imgY + btn.fy * imgH;
+    
+    // Ponto de saÃ­da da caixa de anotaÃ§Ã£o (borda mais prÃ³xima)
+    let sx = ax, sy = ay;
+    const annCenterX = annRect.left - diagramRect.left + annRect.width / 2;
+    const annCenterY = annRect.top - diagramRect.top + annRect.height / 2;
+    
+    if (annCenterX < imgX) {
+      // AnotaÃ§Ã£o Ã  esquerda
+      sx = annRect.left - diagramRect.left + annRect.width;
+      sy = annRect.top - diagramRect.top + annRect.height / 2;
+    } else if (annCenterX > imgX + imgW) {
+      // AnotaÃ§Ã£o Ã  direita
+      sx = annRect.left - diagramRect.left;
+      sy = annRect.top - diagramRect.top + annRect.height / 2;
+    }
+    
+    drawArrow(ctx, sx, sy, bx, by);
+  });
+}
+
+function drawArrow(ctx, x1, y1, x2, y2) {
+  const headLen = 8;
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  
+  // Ponta da seta (sÃ³lida)
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#1a1a6e';
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function setupArrows(diagramId, canvasId, imgId, prefix) {
+  const diagram = document.getElementById(diagramId);
+  if (!diagram) return;
+  
+  const redraw = () => drawArrows(diagramId, canvasId, imgId, prefix);
+  diagram.querySelectorAll('.left-column, .right-column').forEach((col) => {
+    col.addEventListener('scroll', redraw, {passive: true});
+  });
+  redraw();
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    setupArrows('d1', 'c1', 'img2', 'p');
+    setupArrows('d2', 'c2', 'img2', 'e');
+  }, 500);
+});
+
+// Redesenhar setas ao redimensionar a janela
+window.addEventListener('resize', () => {
+  drawArrows('d1', 'c1', 'img2', 'p');
+  drawArrows('d2', 'c2', 'img2', 'e');
+});
+</script>
+</body>
+</html>
